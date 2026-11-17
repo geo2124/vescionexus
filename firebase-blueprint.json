@@ -1,0 +1,622 @@
+{
+  "entities": {
+    "GymMember": {
+      "title": "Gym Member",
+      "description": "A member of the gym with personal and membership details.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "dob": { "type": "string", "format": "date" },
+        "gender": { "type": "string" },
+        "nationality": { "type": "string" },
+        "level": { "type": "string", "enum": ["Novice", "Intermediate", "Expert"] },
+        "height": { "type": "string" },
+        "weight": { "type": "string" },
+        "allergies": { "type": "string" },
+        "healthProblems": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "packageId": { "type": "string" },
+        "startDate": { "type": "string", "format": "date" },
+        "expiryDate": { "type": "string", "format": "date" },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "billingStatus": { "type": "string", "enum": ["paid", "unpaid"] },
+        "addons": { "type": "array", "items": { "type": "string" } },
+        "totalPaid": { "type": "number" },
+        "expectedFee": { "type": "number" },
+        "qrCode": { "type": "string" },
+        "uid": { "type": "string", "description": "The UID of the user who created this member record." }
+      },
+      "required": ["firstName", "lastName", "phone", "packageId", "startDate", "expiryDate", "uid"]
+    },
+    "GymPackage": {
+      "title": "Gym Package",
+      "description": "A membership package offered by the gym.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "duration": { "type": "number", "description": "Duration in months" },
+        "price": { "type": "number" },
+        "discountPercent": { "type": "number" },
+        "discountExpiry": { "type": "string", "format": "date" },
+        "sessions": { "type": "number" },
+        "image": { "type": "string" },
+        "type": { "type": "string", "enum": ["solo", "group"] },
+        "maxPeople": { "type": "number" },
+        "addons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "price": { "type": "number" }
+            }
+          }
+        },
+        "uid": { "type": "string" }
+      },
+      "required": ["name", "duration", "price", "sessions", "type", "uid"]
+    },
+    "Coach": {
+      "title": "Coach",
+      "description": "A fitness coach at the gym.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "dob": { "type": "string", "format": "date" },
+        "gender": { "type": "string" },
+        "yearsOfExperience": { "type": "number" },
+        "lastWorkPlace": { "type": "string" },
+        "specialties": { "type": "array", "items": { "type": "string" } },
+        "hourRate": { "type": "number" },
+        "type": { "type": "string", "enum": ["In House", "Free Lance"] },
+        "sessionsCapacity": { "type": "number" },
+        "photo": { "type": "string" },
+        "nationality": { "type": "string" },
+        "cvFile": { "type": "string" },
+        "idFiles": { "type": "array", "items": { "type": "string" } },
+        "crcFile": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["firstName", "lastName", "phoneNumber", "type", "uid"]
+    },
+    "CoachPackage": {
+      "title": "Coach Package",
+      "description": "A training package offered by a coach.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "lengthInWeeks": { "type": "number" },
+        "sessions": { "type": "number" },
+        "cost": { "type": "number" },
+        "uid": { "type": "string" }
+      },
+      "required": ["name", "lengthInWeeks", "sessions", "cost", "uid"]
+    },
+    "CoachContract": {
+      "title": "Coach Contract",
+      "description": "A contract between a coach and a member or the gym.",
+      "type": "object",
+      "properties": {
+        "coachId": { "type": "string" },
+        "type": { "type": "string", "enum": ["In House", "Free Lance"] },
+        "packageId": { "type": "string" },
+        "price": { "type": "number" },
+        "discountPercent": { "type": "number" },
+        "sessions": { "type": "number" },
+        "startDate": { "type": "string", "format": "date" },
+        "endDate": { "type": "string", "format": "date" },
+        "billingStatus": { "type": "string", "enum": ["paid", "unpaid"] },
+        "uid": { "type": "string" }
+      },
+      "required": ["coachId", "type", "price", "sessions", "startDate", "endDate", "uid"]
+    },
+    "CheckIn": {
+      "title": "Check-In",
+      "description": "A record of a member's visit to the gym.",
+      "type": "object",
+      "properties": {
+        "memberId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "coach": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["memberId", "date", "uid"]
+    },
+    "Booking": {
+      "title": "Court Booking",
+      "description": "A reservation for a sports court.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "type": { "type": "string", "enum": ["full", "half"] },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "category": { "type": "string", "enum": ["public", "academy", "private"] },
+        "numPlayers": { "type": "number" },
+        "court": { "type": "string" },
+        "rateApplied": { "type": "number" },
+        "paid": { "type": "boolean" },
+        "uid": { "type": "string" }
+      },
+      "required": ["name", "date", "startTime", "endTime", "court", "uid"]
+    },
+    "Settings": {
+      "title": "Gym Settings",
+      "description": "Global settings for the gym (rates, off days, etc.).",
+      "type": "object",
+      "properties": {
+        "courtRates": { "type": "object" },
+        "offDays": { "type": "array", "items": { "type": "string" } },
+        "uid": { "type": "string" }
+      },
+      "required": ["uid"]
+    },
+    "User": {
+      "title": "User Profile",
+      "description": "A user of the management system.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["admin", "staff"] },
+        "displayName": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    },
+    "Physiotherapist": {
+      "title": "Physiotherapist",
+      "description": "A physiotherapist working at the clinic.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "specialization": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["firstName", "lastName", "uid"]
+    },
+    "PhysioClient": {
+      "title": "Physio Client",
+      "description": "A client receiving physiotherapy.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "dob": { "type": "string", "format": "date" },
+        "medicalHistory": { "type": "string" },
+        "notes": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["firstName", "lastName", "uid"]
+    },
+    "PhysioProgram": {
+      "title": "Physio Program",
+      "description": "A treatment program for a client.",
+      "type": "object",
+      "properties": {
+        "clientId": { "type": "string" },
+        "name": { "type": "string" },
+        "totalSessions": { "type": "number" },
+        "completedSessions": { "type": "number" },
+        "startDate": { "type": "string", "format": "date" },
+        "endDate": { "type": "string", "format": "date" },
+        "notes": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["clientId", "name", "totalSessions", "uid"]
+    },
+    "PhysioPrescription": {
+      "title": "Physio Prescription",
+      "description": "A prescription or exercise plan for a client.",
+      "type": "object",
+      "properties": {
+        "clientId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "details": { "type": "string" },
+        "exercises": { "type": "array", "items": { "type": "string" } },
+        "uid": { "type": "string" }
+      },
+      "required": ["clientId", "date", "details", "uid"]
+    },
+    "PhysioBooking": {
+      "title": "Physio Booking",
+      "description": "A booking for a physiotherapy session or room.",
+      "type": "object",
+      "properties": {
+        "clientId": { "type": "string" },
+        "therapistId": { "type": "string" },
+        "roomId": { "type": "string", "enum": ["Room 1", "Room 2", "Room 3", "Ice Bath & Sauna"] },
+        "date": { "type": "string", "format": "date" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "status": { "type": "string", "enum": ["scheduled", "completed", "cancelled"] },
+        "type": { "type": "string", "enum": ["treatment", "icebath", "sauna"] },
+        "programId": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["clientId", "roomId", "date", "startTime", "endTime", "uid"]
+    },
+    "AcademyCoach": {
+      "title": "Academy Coach",
+      "description": "A coach in the basketball academy.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "role": { "type": "string", "enum": ["Head Coach", "Assistant Coach"] },
+        "feePerSession": { "type": "number" },
+        "phone": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "uid": { "type": "string" }
+      },
+      "required": ["firstName", "lastName", "role", "feePerSession", "uid"]
+    },
+    "AcademyTeam": {
+      "title": "Academy Team",
+      "description": "A team in the basketball academy.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "ageCategory": { "type": "string" },
+        "headCoachId": { "type": "string" },
+        "assistantCoachId": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["name", "ageCategory", "headCoachId", "uid"]
+    },
+    "AcademyPlayer": {
+      "title": "Academy Player",
+      "description": "A youth player in the basketball academy.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "dob": { "type": "string", "format": "date" },
+        "ageCategory": { "type": "string" },
+        "teamId": { "type": "string" },
+        "parentName": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "uid": { "type": "string" }
+      },
+      "required": ["firstName", "lastName", "dob", "teamId", "parentName", "phone", "uid"]
+    },
+    "AcademyClass": {
+      "title": "Academy Class",
+      "description": "A scheduled class or practice session.",
+      "type": "object",
+      "properties": {
+        "teamId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "coachIds": { "type": "array", "items": { "type": "string" } },
+        "uid": { "type": "string" }
+      },
+      "required": ["teamId", "date", "startTime", "endTime", "uid"]
+    },
+    "AcademyAttendance": {
+      "title": "Academy Attendance",
+      "description": "Attendance record for a player in a class.",
+      "type": "object",
+      "properties": {
+        "classId": { "type": "string" },
+        "playerId": { "type": "string" },
+        "status": { "type": "string", "enum": ["present", "absent", "excused"] },
+        "uid": { "type": "string" }
+      },
+      "required": ["classId", "playerId", "status", "uid"]
+    },
+    "AcademyPayment": {
+      "title": "Academy Payment",
+      "description": "Payment record for a player.",
+      "type": "object",
+      "properties": {
+        "playerId": { "type": "string" },
+        "type": { "type": "string", "enum": ["monthly", "walk-in"] },
+        "amount": { "type": "number" },
+        "date": { "type": "string", "format": "date" },
+        "sessionsIncluded": { "type": "number" },
+        "uid": { "type": "string" }
+      },
+      "required": ["playerId", "type", "amount", "date", "uid"]
+    },
+    "AcademyMerchandise": {
+      "title": "Academy Merchandise",
+      "description": "Merchandise item available for purchase.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "price": { "type": "number" },
+        "uid": { "type": "string" }
+      },
+      "required": ["name", "type", "price", "uid"]
+    },
+    "AcademyMerchandiseOrder": {
+      "title": "Academy Merchandise Order",
+      "description": "Order record for a player's merchandise purchase.",
+      "type": "object",
+      "properties": {
+        "playerId": { "type": "string" },
+        "merchandiseId": { "type": "string" },
+        "size": { "type": "string" },
+        "status": { "type": "string", "enum": ["paid", "pending", "delivered"] },
+        "date": { "type": "string", "format": "date" },
+        "uid": { "type": "string" }
+      },
+      "required": ["playerId", "merchandiseId", "status", "date", "uid"]
+    },
+    "AcademyGame": {
+      "title": "Academy Game",
+      "description": "A scheduled game for a team.",
+      "type": "object",
+      "properties": {
+        "teamId": { "type": "string" },
+        "opponentTeam": { "type": "string" },
+        "gameType": { "type": "string", "enum": ["friendly", "tournament"] },
+        "tournamentName": { "type": "string" },
+        "location": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["teamId", "opponentTeam", "gameType", "location", "date", "time", "uid"]
+    },
+    "TechnicalFile": {
+      "title": "Technical File",
+      "description": "A file or folder in the technical section.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["folder", "file", "link", "form"] },
+        "fileType": { "type": "string" },
+        "url": { "type": "string" },
+        "parentId": { "type": "string" },
+        "section": { "type": "string", "enum": ["shared", "practical"] },
+        "questions": { "type": "array" },
+        "uid": { "type": "string" }
+      },
+      "required": ["name", "type", "section", "uid"]
+    },
+    "AcademyMeeting": {
+      "title": "Academy Meeting",
+      "description": "An online meeting.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "link": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["title", "date", "time", "link", "uid"]
+    },
+    "AcademySeminar": {
+      "title": "Academy Seminar",
+      "description": "A seminar setup.",
+      "type": "object",
+      "properties": {
+        "topic": { "type": "string" },
+        "lecturers": { "type": "string" },
+        "location": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["topic", "lecturers", "location", "date", "time", "uid"]
+    },
+    "AcademyEvent": {
+      "title": "Academy Event",
+      "description": "A special event in the academy.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "type": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "endDate": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "location": { "type": "string" },
+        "teamIds": { "type": "array", "items": { "type": "string" } },
+        "staffIds": { "type": "array", "items": { "type": "string" } },
+        "coachIds": { "type": "array", "items": { "type": "string" } },
+        "fees": { "type": "number" },
+        "discountRange": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["title", "type", "uid"]
+    },
+    "AcademyBranch": {
+      "title": "Academy Branch",
+      "description": "A branch of the academy.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "city": { "type": "string" },
+        "address": { "type": "string" },
+        "contactPerson": { "type": "string" },
+        "phone": { "type": "string" },
+        "schedule": { "type": "array" },
+        "uid": { "type": "string" }
+      },
+      "required": ["name", "city", "address", "uid"]
+    },
+    "AcademySupplier": {
+      "title": "Academy Supplier",
+      "description": "A supplier for the academy.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["firstName", "lastName", "uid"]
+    },
+    "AcademySettings": {
+      "title": "Academy Settings",
+      "description": "Settings for the academy.",
+      "type": "object",
+      "properties": {
+        "isDarkMode": { "type": "boolean" },
+        "academyTitle": { "type": "string" },
+        "academyPhoto": { "type": "string" },
+        "buttonColorLight": { "type": "string" },
+        "buttonColorDark": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["uid"]
+    },
+    "Staff": {
+      "title": "Staff",
+      "description": "A staff member of the academy.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "dob": { "type": "string", "format": "date" },
+        "phone": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string" },
+        "branchId": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["firstName", "lastName", "role", "uid"]
+    },
+    "AcademyMetadata": {
+      "title": "Academy Metadata",
+      "description": "Lookup data for dropdowns (roles, types, categories).",
+      "type": "object",
+      "properties": {
+        "eventTypes": { "type": "array", "items": { "type": "string" } },
+        "staffRoles": { "type": "array", "items": { "type": "string" } },
+        "coachRoles": { "type": "array", "items": { "type": "string" } },
+        "merchTypes": { "type": "array", "items": { "type": "string" } },
+        "ageCategories": { "type": "array", "items": { "type": "string" } },
+        "paymentTypes": { "type": "array", "items": { "type": "string" } },
+        "uid": { "type": "string" }
+      },
+      "required": ["uid"]
+    },
+    "InventoryItem": {
+      "title": "Inventory Item",
+      "description": "An item in the inventory.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "price": { "type": "number" },
+        "cost": { "type": "number" },
+        "stock": { "type": "number" },
+        "barcode": { "type": "string" },
+        "image": { "type": "string" },
+        "type": { "type": "string", "enum": ["cafeteria", "retail"] },
+        "uid": { "type": "string" }
+      },
+      "required": ["name", "category", "price", "cost", "stock", "type", "uid"]
+    },
+    "POSOrder": {
+      "title": "POS Order",
+      "description": "An order placed through the POS.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "itemId": { "type": "string" },
+              "name": { "type": "string" },
+              "quantity": { "type": "number" },
+              "price": { "type": "number" }
+            }
+          }
+        },
+        "subtotal": { "type": "number" },
+        "discount": { "type": "number" },
+        "total": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["cash", "card", "member_balance"] },
+        "memberId": { "type": "string" },
+        "type": { "type": "string", "enum": ["cafeteria", "retail"] },
+        "date": { "type": "string" },
+        "uid": { "type": "string" }
+      },
+      "required": ["items", "subtotal", "discount", "total", "paymentMethod", "type", "date", "uid"]
+    },
+    "HREmployee": {
+      "title": "HR Employee",
+      "description": "Unified employee record for HR and Accounting Payroll.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "department": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "salary": { "type": "number" },
+        "hourlyOvertimeRate": { "type": "number" },
+        "nssfContribution": { "type": "number" },
+        "commissionRatePerSession": { "type": "number" },
+        "commissionPercent": { "type": "number" },
+        "linkedCoachId": { "type": "string" },
+        "linkedTherapistId": { "type": "string" },
+        "joinDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "on_leave", "terminated"] },
+        "advances": { "type": "number" },
+        "bonuses": { "type": "number" },
+        "deductions": { "type": "number" },
+        "lastPayrollPaidMonth": { "type": "string" }
+      },
+      "required": ["name", "role", "department", "salary", "status"]
+    }
+  },
+  "firestore": {
+    "/members": { "schema": "GymMember", "description": "Gym members collection" },
+    "/packages": { "schema": "GymPackage", "description": "Membership packages collection" },
+    "/coaches": { "schema": "Coach", "description": "Gym coaches collection" },
+    "/coachPackages": { "schema": "CoachPackage", "description": "Coach training packages collection" },
+    "/coachContracts": { "schema": "CoachContract", "description": "Coach contracts collection" },
+    "/checkIns": { "schema": "CheckIn", "description": "All check-ins collection" },
+    "/bookings": { "schema": "Booking", "description": "Court bookings collection" },
+    "/settings": { "schema": "Settings", "description": "Global settings collection" },
+    "/users": { "schema": "User", "description": "User profiles collection" },
+    "/physiotherapists": { "schema": "Physiotherapist", "description": "Physiotherapists collection" },
+    "/physioClients": { "schema": "PhysioClient", "description": "Physio clients collection" },
+    "/physioPrograms": { "schema": "PhysioProgram", "description": "Physio programs collection" },
+    "/physioPrescriptions": { "schema": "PhysioPrescription", "description": "Physio prescriptions collection" },
+    "/physioBookings": { "schema": "PhysioBooking", "description": "Physio bookings collection" },
+    "/academyCoaches": { "schema": "AcademyCoach", "description": "Academy coaches collection" },
+    "/academyTeams": { "schema": "AcademyTeam", "description": "Academy teams collection" },
+    "/academyPlayers": { "schema": "AcademyPlayer", "description": "Academy players collection" },
+    "/academyClasses": { "schema": "AcademyClass", "description": "Academy classes collection" },
+    "/academyAttendance": { "schema": "AcademyAttendance", "description": "Academy attendance collection" },
+    "/academyPayments": { "schema": "AcademyPayment", "description": "Academy payments collection" },
+    "/academyMerchandise": { "schema": "AcademyMerchandise", "description": "Academy merchandise catalog" },
+    "/academyMerchandiseOrders": { "schema": "AcademyMerchandiseOrder", "description": "Academy merchandise orders" },
+    "/academyGames": { "schema": "AcademyGame", "description": "Academy games collection" },
+    "/technicalFiles": { "schema": "TechnicalFile", "description": "Technical files and folders" },
+    "/academyMeetings": { "schema": "AcademyMeeting", "description": "Academy online meetings" },
+    "/academySeminars": { "schema": "AcademySeminar", "description": "Academy seminars" },
+    "/academyEvents": { "schema": "AcademyEvent", "description": "Academy events collection" },
+    "/academyBranches": { "schema": "AcademyBranch", "description": "Academy branches collection" },
+    "/academySuppliers": { "schema": "AcademySupplier", "description": "Academy suppliers collection" },
+    "/academySettings": { "schema": "AcademySettings", "description": "Academy settings collection" },
+    "/staff": { "schema": "Staff", "description": "Staff collection" },
+    "/academyMetadata": { "schema": "AcademyMetadata", "description": "Academy metadata collection" },
+    "/inventory": { "schema": "InventoryItem", "description": "Inventory items collection" },
+    "/orders": { "schema": "POSOrder", "description": "POS orders collection" },
+    "/hr_employees": { "schema": "HREmployee", "description": "Unified HR employees collection" }
+  }
+}

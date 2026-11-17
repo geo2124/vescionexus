@@ -1,0 +1,307 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Core Auth
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Role Definitions
+    function getRole() {
+      return get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role;
+    }
+    
+    function isStaff() {
+      return isAuthenticated() && exists(/databases/$(database)/documents/staff/$(request.auth.uid));
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (
+        (isStaff() && getRole() == 'admin') ||
+        request.auth.token.email == 'admin@eliteos.com' ||
+        request.auth.token.email == 'geogo3@gmail.com' ||
+        request.auth.token.email == 'Jess.chakh22@gmail.com' ||
+        request.auth.token.email == 'jess.chakh22@gmail.com'
+      );
+    }
+    
+    function isAuthorizedUser() {
+      return isStaff() || isAdmin();
+    }
+
+    // Default deny for undefined paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 1. Members (+ subcollections) - Controlled Updates
+    match /members/{memberId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthorizedUser() || (
+        request.resource.data.isPhysioPatient == true &&
+        request.resource.data.intakeSource == 'self_link' &&
+        request.resource.data.firstName is string &&
+        request.resource.data.lastName is string &&
+        request.resource.data.phone is string
+      );
+      allow update: if isAuthorizedUser();
+      allow delete: if isAdmin();
+      
+      match /checkIns/{checkInId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated(); // Frontend needs to checkin members
+        allow update, delete: if isAuthorizedUser();
+      }
+    }
+
+    // 2. Transactions - Ledger protection
+    match /transactions/{transactionId} {
+      allow read: if isAuthorizedUser();
+      allow create: if isAuthorizedUser(); // No arbitrary historical edits
+      allow update, delete: if isAuthorizedUser(); 
+    }
+    
+    match /advanced_transactions/{transactionId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+
+    // 3. System Audit - Append only
+    match /system_audit/{auditId} {
+      allow read: if isAuthorizedUser();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // 4. Coupons & Cashback - Controlled writes
+    match /coupons/{couponId} {
+      allow read: if isAuthenticated(); // Need to validate in checkout
+      allow create: if isAuthorizedUser();
+      allow update: if isAuthenticated(); // Usage count increment
+      allow delete: if isAdmin();
+      
+      match /redemptions/{redemptionId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated(); // Redeem
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    match /cashbackCodes/{codeId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthorizedUser();
+      allow update: if isAuthenticated(); // Usage count increment
+      allow delete: if isAdmin();
+    }
+    match /cashbackCards/{cardId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser();
+    }
+
+    // 5. Inventory
+    match /inventory/{itemId} {
+      allow read: if isAuthenticated();
+      allow create, delete: if isAuthorizedUser();
+      allow update: if isAuthenticated(); // Checkout decrements stock
+    }
+
+    // 6. POS Orders
+    match /POSOrders/{orderId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated(); 
+      allow update, delete: if isAuthorizedUser(); 
+    }
+    match /posOrders/{orderId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated(); 
+      allow update, delete: if isAuthorizedUser(); 
+    }
+    match /orders/{orderId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated(); 
+      allow update, delete: if isAuthorizedUser(); 
+    }
+
+    // 7. Reservations / Bookings
+    match /reservations/{reservationId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated(); 
+    }
+    match /bookings/{bookingId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // 8. Physio Module
+    match /physioSessions/{id} { allow read, write: if isAuthorizedUser(); }
+    match /physioPrograms/{id} { allow read, write: if isAuthorizedUser(); }
+    match /physioBookings/{id} { allow read, write: if isAuthorizedUser(); }
+    match /physioClients/{id} { allow read, write: if isAuthorizedUser(); }
+    match /physioPrescriptions/{id} { allow read, write: if isAuthorizedUser(); }
+    match /physiotherapists/{id} { allow read: if true; allow write: if isAuthorizedUser(); }
+    match /physio_intake_submissions/{id} {
+      allow read: if isAuthenticated();
+      allow create: if request.resource.data.firstName is string &&
+                    request.resource.data.lastName is string &&
+                    request.resource.data.phone is string;
+      allow update, delete: if isAuthorizedUser();
+    }
+    match /physio_rooms/{id} { allow read: if isAuthenticated(); allow write: if isAuthorizedUser(); }
+    match /physio_settings/{id} { allow read: if isAuthenticated(); allow write: if isAuthorizedUser(); }
+    match /physio_packages/{id} { allow read: if isAuthenticated(); allow write: if isAuthorizedUser(); }
+    match /physio_third_party_contracts/{id} { allow read: if isAuthenticated(); allow write: if isAuthorizedUser(); }
+
+    // 9. Coach Logic
+    match /coaches/{coachId} {
+      allow read: if isAuthenticated();
+      allow create, delete: if isAuthorizedUser();
+      allow update: if isAuthenticated(); // Tracking updates
+    }
+    match /coachPackages/{packageId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser();
+    }
+    match /coachContracts/{contractId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated(); // Frontend decrements sessions
+    }
+
+    // 10. Staff & Users
+    match /staff/{staffId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdmin() || request.auth.uid == staffId;
+      allow delete: if isAdmin();
+    }
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || request.auth.uid == userId;
+    }
+
+    // 11. Custom Accounting & HR
+    match /invoices/{invoiceId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser();
+    }
+    match /expenses/{expenseId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser();
+    }
+    match /chartOfAccounts/{accountId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser();
+    }
+    match /fiscalRules/{ruleId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser();
+    }
+    match /payrolls/{payrollId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /staff_payments/{paymentId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /staff_attendance/{attendanceId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /staff_leaves/{leaveId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /staff_departments/{departmentId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /fixed_assets/{assetId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /budgets/{budgetId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /accruals/{accrualId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /purchaseOrders/{poId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /employees/{empId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /hr_employees/{empId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+
+    // 11. Academy Settings & Others
+    match /academyBranches/{id} { allow read, write: if isAuthorizedUser(); }
+    match /academyTeams/{id} { allow read, write: if isAuthorizedUser(); }
+    match /academyPlayers/{id} { allow read, write: if isAuthorizedUser(); }
+    match /academyClasses/{id} { allow read, write: if isAuthorizedUser(); }
+    match /academyAttendance/{id} { allow read, write: if isAuthorizedUser(); }
+    match /academyPayments/{id} { allow read: if isAuthorizedUser(); allow create: if isAuthenticated(); allow update, delete: if isAuthorizedUser(); }
+    match /academyMerchandise/{id} { allow read: if isAuthenticated(); allow write: if isAuthorizedUser(); }
+    match /academyMerchandiseOrders/{id} { allow read: if isAuthenticated(); allow create: if isAuthenticated(); allow update, delete: if isAuthorizedUser(); }
+    match /academyGames/{id} { allow read, write: if isAuthorizedUser(); }
+    match /technicalFiles/{id} { allow read, write: if isAuthorizedUser(); }
+    match /academyMeetings/{id} { allow read, write: if isAuthorizedUser(); }
+    match /academySeminars/{id} { allow read, write: if isAuthorizedUser(); }
+    match /academyEvents/{id} { allow read: if isAuthenticated(); allow write: if isAuthorizedUser(); }
+    match /academySuppliers/{id} { allow read, write: if isAuthorizedUser(); }
+    match /academySettings/{id} { allow read: if isAuthenticated(); allow write: if isAuthorizedUser(); }
+    match /academyMetadata/{id} { allow read: if isAuthenticated(); allow write: if isAuthorizedUser(); }
+    match /academyCoaches/{id} { allow read: if isAuthenticated(); allow write: if isAuthorizedUser(); }
+
+    // Misc
+    match /custom_reports/{reportId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser();
+    }
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser() || (isAuthenticated() && settingId == 'dashboard_' + request.auth.uid);
+    }
+    match /system/{systemId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    match /packages/{packageId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser();
+    }
+    match /coach_packages/{packageId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser();
+    }
+    match /gym_scheduled_sessions/{sessionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser();
+    }
+    match /gym_third_party_contracts/{contractId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthorizedUser();
+    }
+    match /pos_parked_orders/{tabId} {
+      allow read, write: if isAuthenticated();
+    }
+    match /pos_shifts/{shiftId} {
+      allow read, write: if isAuthenticated();
+    }
+    match /recurring_expenses/{templateId} {
+      allow read, write: if isAuthorizedUser();
+    }
+    match /suppliers/{supplierId} {
+      allow read, write: if isAuthorizedUser();
+    }
+    match /_connection_test_/{testId} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

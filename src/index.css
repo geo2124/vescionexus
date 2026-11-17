@@ -1,0 +1,316 @@
+@import "tailwindcss";
+
+/* Allow dark: classes to work when .dark is present */
+@custom-variant dark (&:is(.dark, .dark *));
+
+
+@layer base {
+  :root {
+    --nexus-cyan: #00B8C8;
+    --nexus-cyan-hover: #0099A8;
+    --nexus-obsidian: #05070A;
+    --nexus-surface-1: #0B0F17;
+    --nexus-surface-2: #101622;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+::-webkit-scrollbar-track {
+  background: rgba(11, 15, 23, 0.6) !important;
+  border-radius: 9999px !important;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(63, 63, 70, 0.8) !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00B8C8 !important;
+}
+::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+@layer components {
+  /* Forms & Inputs */
+  .el-input {
+    @apply w-full px-4 py-2.5 rounded-xl border transition-all outline-none text-sm;
+    @apply bg-white border-slate-200/90 text-slate-900 placeholder-slate-400 shadow-sm focus:border-[#00B8C8] focus:ring-4 focus:ring-[#00B8C8]/15 [color-scheme:light];
+    @apply dark:bg-[#05070A] dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:border-[#00B8C8] dark:focus:ring-[#00B8C8]/20 dark:[color-scheme:dark];
+  }
+
+  .el-select {
+    @apply w-full px-4 py-2.5 rounded-xl border appearance-none transition-all outline-none text-sm cursor-pointer;
+    @apply bg-white border-slate-200/90 text-slate-900 shadow-sm focus:border-[#00B8C8] focus:ring-4 focus:ring-[#00B8C8]/15 [color-scheme:light];
+    @apply dark:bg-[#05070A] dark:border-zinc-800/80 dark:text-zinc-100 dark:focus:border-[#00B8C8] dark:focus:ring-[#00B8C8]/20 dark:[color-scheme:dark];
+  }
+
+  /* Buttons */
+  .el-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-xs font-bold rounded-xl transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed uppercase tracking-wider;
+    @apply bg-[#00B8C8] text-slate-950 hover:bg-[#0099A8] hover:shadow-lg hover:shadow-cyan-500/25;
+  }
+
+  .el-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-xs font-bold rounded-xl border transition-all shadow-sm active:scale-[0.98] disabled:opacity-40 uppercase tracking-wider;
+    @apply bg-white border-slate-200/90 text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:border-cyan-500/40 hover:shadow-md;
+    @apply dark:bg-[#0B0F17] dark:border-zinc-800/80 dark:text-zinc-300 dark:hover:bg-[#101622] dark:hover:text-zinc-100 dark:hover:border-cyan-500/40;
+  }
+
+  .el-btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98];
+    @apply text-slate-500 hover:bg-slate-100 hover:text-slate-900;
+    @apply dark:text-zinc-400 dark:hover:bg-[#0B0F17] dark:hover:text-zinc-100;
+  }
+
+  /* Checkboxes & Switches */
+  .el-checkbox {
+    @apply w-5 h-5 rounded border-2 transition-all cursor-pointer accent-[#00B8C8];
+    @apply border-slate-300 focus:ring-[#00B8C8]/20;
+    @apply dark:border-zinc-800 dark:bg-[#0B0F17];
+  }
+
+  .el-switch {
+    @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#00B8C8] focus:ring-offset-2;
+    @apply bg-slate-200 dark:bg-zinc-800;
+  }
+
+  .el-switch-dot {
+    @apply inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200;
+  }
+
+  /* Segmented Control / Selection States */
+  .el-segmented {
+    @apply flex p-1 rounded-xl transition-all gap-1;
+    @apply bg-slate-100/90 border border-slate-200/70;
+    @apply dark:bg-[#0B0F17] dark:border-zinc-800/80;
+  }
+
+  .el-segmented-item {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 text-[11px] uppercase tracking-widest font-bold rounded-lg transition-all text-center cursor-pointer whitespace-nowrap;
+    @apply text-slate-500 hover:text-slate-800;
+    @apply dark:text-zinc-400 dark:hover:text-zinc-100;
+  }
+
+  .el-segmented-item-active {
+    @apply bg-white text-[#00B8C8] shadow-md ring-1 ring-cyan-500/30;
+    @apply dark:bg-[#101622] dark:text-[#00B8C8] dark:ring-cyan-500/30;
+  }
+
+  /* Status Badges */
+  .el-badge {
+    @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5;
+  }
+
+  .el-badge-success { 
+    @apply bg-emerald-50 text-emerald-600 border border-emerald-100;
+    @apply dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20; 
+  }
+  .el-badge-warning { 
+    @apply bg-amber-50 text-amber-600 border border-amber-100;
+    @apply dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20; 
+  }
+  .el-badge-danger { 
+    @apply bg-red-50 text-red-600 border border-red-100;
+    @apply dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20; 
+  }
+  .el-badge-info { 
+    @apply bg-cyan-50 text-[#0099A8] border border-cyan-200/60;
+    @apply dark:bg-cyan-500/10 dark:text-[#00B8C8] dark:border-cyan-500/30; 
+  }
+  .el-badge-neutral { 
+    @apply bg-slate-50 text-slate-600 border border-slate-200;
+    @apply dark:bg-[#0B0F17] dark:text-zinc-400 dark:border-zinc-800/80; 
+  }
+
+  /* Cards & Containers */
+  .el-card {
+    @apply rounded-2xl border transition-all overflow-hidden;
+    @apply bg-white border-slate-200/80 shadow-sm hover:border-cyan-500/50;
+    @apply dark:bg-[#0B0F17]/90 dark:border-zinc-800/80 dark:hover:border-cyan-500/40 dark:shadow-none;
+  }
+
+  .el-panel {
+    @apply rounded-2xl border p-5 transition-all;
+    @apply bg-[#F8FAFC] border-slate-200/80;
+    @apply dark:bg-[#05070A] dark:border-zinc-800/80;
+  }
+}
+
+/* ========================================================================== */
+/* 1. EXPLICIT <option> AND <optgroup> CONTRAST RULES (LIGHT & DARK SURFACES) */
+/* ========================================================================== */
+html:not(.dark) option,
+html:not(.dark) optgroup {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.dark option,
+.dark optgroup,
+select[class*="bg-zinc-9"] option,
+select[class*="bg-zinc-8"] option,
+select[class*="bg-slate-9"] option,
+select[class*="bg-slate-8"] option,
+select[class*="bg-[#0"] option,
+select[class*="bg-[#1"] option,
+[class*="bg-[#0"] select option,
+[class*="bg-[#1"] select option,
+[class*="bg-zinc-9"] select option,
+[class*="bg-zinc-8"] select option,
+select[class*="bg-zinc-9"] optgroup,
+select[class*="bg-zinc-8"] optgroup,
+select[class*="bg-slate-9"] optgroup,
+select[class*="bg-[#0"] optgroup,
+select[class*="bg-[#1"] optgroup {
+  background-color: #0B0F17 !important;
+  color: #F4F4F5 !important;
+}
+
+/* If a select explicitly has a light background inside a dark ancestor, keep its options light */
+select.bg-white option,
+select.bg-slate-50 option,
+select.bg-zinc-50 option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* ========================================================================== */
+/* 2. COMPLETE DARK & LIGHT INPUT / SELECT / TEXTAREA SELECTOR COVERAGE       */
+/* ========================================================================== */
+input[class*="bg-zinc-9"],
+input[class*="bg-zinc-8"],
+input[class*="bg-slate-9"],
+input[class*="bg-slate-8"],
+input[class*="bg-[#0B0F17]"],
+input[class*="bg-[#05070A]"],
+input[class*="bg-[#101622]"],
+input[class*="bg-[#121212]"],
+input[class*="bg-[#1a1a1a]"],
+select[class*="bg-zinc-9"],
+select[class*="bg-zinc-8"],
+select[class*="bg-slate-9"],
+select[class*="bg-slate-8"],
+select[class*="bg-[#0B0F17]"],
+select[class*="bg-[#05070A]"],
+select[class*="bg-[#101622]"],
+select[class*="bg-[#121212]"],
+select[class*="bg-[#1a1a1a]"],
+textarea[class*="bg-zinc-9"],
+textarea[class*="bg-zinc-8"],
+textarea[class*="bg-slate-9"],
+textarea[class*="bg-slate-8"],
+textarea[class*="bg-[#0B0F17]"],
+textarea[class*="bg-[#05070A]"],
+textarea[class*="bg-[#101622]"],
+textarea[class*="bg-[#121212]"],
+textarea[class*="bg-[#1a1a1a]"] {
+  color: #f4f4f5 !important;
+  caret-color: #00B8C8 !important;
+  color-scheme: dark !important;
+}
+
+input[class*="bg-zinc-9"]::placeholder,
+input[class*="bg-zinc-8"]::placeholder,
+input[class*="bg-slate-9"]::placeholder,
+input[class*="bg-slate-8"]::placeholder,
+input[class*="bg-[#0B0F17]"]::placeholder,
+input[class*="bg-[#05070A]"]::placeholder,
+input[class*="bg-[#101622]"]::placeholder,
+input[class*="bg-[#121212]"]::placeholder,
+input[class*="bg-[#1a1a1a]"]::placeholder,
+textarea[class*="bg-zinc-9"]::placeholder,
+textarea[class*="bg-zinc-8"]::placeholder,
+textarea[class*="bg-slate-9"]::placeholder,
+textarea[class*="bg-slate-8"]::placeholder,
+textarea[class*="bg-[#0B0F17]"]::placeholder,
+textarea[class*="bg-[#05070A]"]::placeholder,
+textarea[class*="bg-[#101622]"]::placeholder,
+textarea[class*="bg-[#121212]"]::placeholder,
+textarea[class*="bg-[#1a1a1a]"]::placeholder {
+  color: #a1a1aa !important;
+}
+
+html:not(.dark) input.bg-white,
+html:not(.dark) input.bg-slate-50,
+html:not(.dark) input.bg-slate-100,
+html:not(.dark) input.bg-zinc-50,
+html:not(.dark) input.bg-zinc-100,
+html:not(.dark) select.bg-white,
+html:not(.dark) select.bg-slate-50,
+html:not(.dark) select.bg-slate-100,
+html:not(.dark) select.bg-zinc-50,
+html:not(.dark) select.bg-zinc-100,
+html:not(.dark) textarea.bg-white,
+html:not(.dark) textarea.bg-slate-50,
+html:not(.dark) textarea.bg-slate-100,
+html:not(.dark) textarea.bg-zinc-50,
+html:not(.dark) textarea.bg-zinc-100 {
+  color: #0f172a !important;
+  caret-color: #0099A8 !important;
+  color-scheme: light !important;
+}
+
+.dark input.bg-white:not([class*="dark:bg-"]),
+.dark select.bg-white:not([class*="dark:bg-"]),
+.dark textarea.bg-white:not([class*="dark:bg-"]) {
+  color: #0f172a !important;
+  color-scheme: light !important;
+}
+
+/* Transparent inputs & selects in Dark vs. Light mode */
+.dark input.bg-transparent,
+.dark select.bg-transparent,
+.dark textarea.bg-transparent {
+  color: #f4f4f5 !important;
+  caret-color: #00B8C8 !important;
+  color-scheme: dark !important;
+}
+
+html:not(.dark) input.bg-transparent:not(.text-white):not(.text-zinc-100),
+html:not(.dark) select.bg-transparent:not(.text-white):not(.text-zinc-100),
+html:not(.dark) textarea.bg-transparent:not(.text-white):not(.text-zinc-100) {
+  color: #0f172a !important;
+  caret-color: #0099A8 !important;
+  color-scheme: light !important;
+}
+
+/* ========================================================================== */
+/* 3. BROWSER AUTOFILL (:-webkit-autofill) CONTRAST RULES                     */
+/* ========================================================================== */
+html:not(.dark) input:-webkit-autofill,
+html:not(.dark) input:-webkit-autofill:hover,
+html:not(.dark) input:-webkit-autofill:focus,
+html:not(.dark) textarea:-webkit-autofill,
+html:not(.dark) select:-webkit-autofill {
+  -webkit-text-fill-color: #0f172a !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  caret-color: #0099A8 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark select:-webkit-autofill,
+input[class*="bg-zinc-9"]:-webkit-autofill,
+input[class*="bg-zinc-8"]:-webkit-autofill,
+input[class*="bg-slate-9"]:-webkit-autofill,
+input[class*="bg-[#0"]:-webkit-autofill,
+input[class*="bg-[#1"]:-webkit-autofill,
+select[class*="bg-zinc-9"]:-webkit-autofill,
+select[class*="bg-[#0"]:-webkit-autofill,
+select[class*="bg-[#1"]:-webkit-autofill {
+  -webkit-text-fill-color: #f4f4f5 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #0B0F17 inset !important;
+  caret-color: #00B8C8 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+
+
+
