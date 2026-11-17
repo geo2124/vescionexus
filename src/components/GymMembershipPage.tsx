@@ -536,7 +536,7 @@ const GymMembershipPage: React.FC = () => {
       return;
     }
     
-    const newOffDays = [...offDays, newOffDay].sort();
+    const newOffDays = [...offDays, newOffDay].sort((a, b) => a.localeCompare(b));
     try {
       await setDoc(doc(db, 'settings', 'global'), { offDays: newOffDays, uid: user.uid }, { merge: true });
       setNewOffDay('');

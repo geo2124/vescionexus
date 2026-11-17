@@ -142,7 +142,7 @@ export const PeriodCloseModule: React.FC<Props> = ({ isDarkMode, formatCurrency 
          <h4 className="font-bold text-sm mb-4 uppercase tracking-widest text-zinc-500">Currently Locked Periods</h4>
          <div className="flex flex-wrap gap-2">
             {closedPeriods.length === 0 && <span className="text-sm text-zinc-500 italic">No periods are currently locked.</span>}
-            {closedPeriods.sort().reverse().map(p => (
+            {[...closedPeriods].sort((a, b) => a.localeCompare(b)).reverse().map(p => (
               <div key={p} className="flex items-center gap-2 px-3 py-1.5 bg-slate-200 dark:bg-zinc-900 rounded-lg text-sm font-mono border border-slate-300 dark:border-zinc-800">
                 <Lock size={14} className="text-rose-500" /> {p}
               </div>

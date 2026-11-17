@@ -178,18 +178,21 @@ const MasterCalendarPage: React.FC = () => {
         doc(db, 'settings', 'master_calendar_colors'),
         snap => {
           if (snap.exists()) {
-            const data = snap.data() as any;
-            const merged: Record<DepartmentType, string> = {
-              basketball: isValidHexColor(data.basketball || '') ? data.basketball : DEFAULT_CALENDAR_COLORS.basketball,
-              padel_tennis: isValidHexColor(data.padel_tennis || '') ? data.padel_tennis : DEFAULT_CALENDAR_COLORS.padel_tennis,
-              gym: isValidHexColor(data.gym || '') ? data.gym : DEFAULT_CALENDAR_COLORS.gym,
-              physio: isValidHexColor(data.physio || '') ? data.physio : DEFAULT_CALENDAR_COLORS.physio
-            };
+            const data = snap.data() as Record<string, unknown>;
+            const validKeys: DepartmentType[] = ['basketball', 'padel_tennis', 'gym', 'physio'];
+            const merged = {} as Record<DepartmentType, string>;
+            for (const key of validKeys) {
+              const rawVal = typeof data?.[key] === 'string' ? (data[key] as string).trim() : '';
+              const match = /^#[0-9A-Fa-f]{6}$/.exec(rawVal);
+              merged[key] = match ? match[0] : DEFAULT_CALENDAR_COLORS[key];
+            }
             setCalendarColors(merged);
             setHexDrafts(merged);
             try {
               localStorage.setItem('vescio_master_calendar_colors', JSON.stringify(merged));
-            } catch {}
+            } catch (err) {
+              console.warn('Failed to cache calendar colors locally:', err);
+            }
           }
         },
         () => {}
@@ -543,19 +546,39 @@ const MasterCalendarPage: React.FC = () => {
     return filteredEvents.filter(e => e.date === selectedDateStr);
   }, [filteredEvents, selectedDateStr]);
 
+  const sanitizeCalendarColors = (
+    rawColors: Record<string, unknown>,
+    fallbackColors: Record<DepartmentType, string>
+  ): Record<DepartmentType, string> => {
+    const validKeys: DepartmentType[] = ['basketball', 'padel_tennis', 'gym', 'physio'];
+    const sanitized = {} as Record<DepartmentType, string>;
+    for (const key of validKeys) {
+      const candidate = rawColors?.[key];
+      const strVal = typeof candidate === 'string' ? candidate.trim() : '';
+      const match = /^#[0-9A-Fa-f]{6}$/.exec(strVal);
+      sanitized[key] = match ? match[0] : fallbackColors[key];
+    }
+    return sanitized;
+  };
+
   const persistCalendarColors = async (nextColors: Record<DepartmentType, string>) => {
-    setCalendarColors(nextColors);
-    setHexDrafts(nextColors);
+    const safeColors = sanitizeCalendarColors(nextColors, DEFAULT_CALENDAR_COLORS);
+    setCalendarColors(safeColors);
+    setHexDrafts(safeColors);
     try {
-      localStorage.setItem('vescio_master_calendar_colors', JSON.stringify(nextColors));
-    } catch {}
+      localStorage.setItem('vescio_master_calendar_colors', JSON.stringify(safeColors));
+    } catch (err) {
+      console.warn('Failed to persist calendar colors locally:', err);
+    }
     try {
       await setDoc(
         doc(db, 'settings', 'master_calendar_colors'),
-        { ...nextColors, updatedAt: new Date().toISOString() },
+        { ...safeColors, updatedAt: new Date().toISOString() },
         { merge: true }
       );
-    } catch {}
+    } catch (err) {
+      console.warn('Failed to persist calendar colors to Firestore:', err);
+    }
   };
 
   const handleUpdateDepartmentColor = async (dept: DepartmentType, rawHex: string) => {

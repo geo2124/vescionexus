@@ -100,7 +100,7 @@ export const FXTracking: React.FC<FXTrackingProps> = ({ isDarkMode, formatCurren
   const displayGainLoss = currency === 'LBP' ? totalGainLossLBP : totalGainLossUSD;
   const netRealizedFXUSD = realizedGainUSD - realizedLossUSD;
 
-  const periods = Object.keys(historicalRatesMap).sort().reverse();
+  const periods = Object.keys(historicalRatesMap).sort((a, b) => a.localeCompare(b)).reverse();
 
   const handlePostFXRevaluation = async () => {
     const absDiffUSD = Math.abs(totalGainLossUSD);

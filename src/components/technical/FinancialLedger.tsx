@@ -468,7 +468,7 @@ export const FinancialLedger: React.FC<FinancialLedgerProps> = ({ isDarkMode, is
         modules.add('system');
       }
     });
-    return Array.from(modules).sort();
+    return Array.from(modules).sort((a, b) => a.localeCompare(b));
   }, [allTransactions]);
 
   // --- Reports Calculations ---
@@ -745,7 +745,7 @@ export const FinancialLedger: React.FC<FinancialLedgerProps> = ({ isDarkMode, is
       });
     });
     
-    return Object.keys(gl).sort().reduce((acc, key) => {
+    return Object.keys(gl).sort((a, b) => a.localeCompare(b)).reduce((acc, key) => {
        acc[key] = gl[key];
        return acc;
     }, {} as Record<string, { openingBalance: number; closingBalance: number; movements: any[] }>);

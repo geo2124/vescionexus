@@ -42,7 +42,7 @@ export const GrowthMetrics: React.FC<GrowthMetricsProps> = ({ isDarkMode, transa
 
     const arr = mrr * 12;
 
-    const chartData = Object.keys(monthlyData).sort().slice(-6).map(key => ({
+    const chartData = Object.keys(monthlyData).sort((a, b) => a.localeCompare(b)).slice(-6).map(key => ({
       name: key,
       value: monthlyData[key]
     }));

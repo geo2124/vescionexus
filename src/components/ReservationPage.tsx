@@ -712,7 +712,7 @@ const ReservationPage: React.FC = () => {
 
   const handleAddOffDay = async () => {
     if (newOffDay && !offDays.includes(newOffDay) && user) {
-      const newOffDays = [...offDays, newOffDay].sort();
+      const newOffDays = [...offDays, newOffDay].sort((a, b) => a.localeCompare(b));
       try {
         await setDoc(doc(db, 'settings', 'court_config'), { offDays: newOffDays, uid: user.uid }, { merge: true });
         setOffDays(newOffDays);
